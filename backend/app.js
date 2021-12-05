@@ -15,6 +15,7 @@ app.options("*", cors());
 app.use(bodyParser.json());
 app.use(morgan("tiny"));
 app.use(authJwt());
+app.use("/public/uploads", express.static(__dirname + "/public/uploads"));
 app.use(errorHandler);
 
 //Routes
@@ -36,6 +37,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     dbName: "eshop-database",
+    useFindAndModify: false,
   })
   .then(() => {
     console.log("Database Connection is ready...");
