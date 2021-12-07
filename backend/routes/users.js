@@ -15,6 +15,10 @@ router.get(`/`, async (req, res) => {
 });
 
 router.get(`/:id`, async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    res.status(400).send("Invalid User Id");
+  }
+
   const user = await User.findById(req.params.id).select("-passwordHash");
 
   if (!user) {
