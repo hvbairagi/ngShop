@@ -78,12 +78,13 @@
           <div class="p-fluid formgrid grid">
             <div class="field col-4">
               <label for="countInStock">Count in stock</label>
-              <input
+              <p-inputNumber
                 formControlName="countInStock"
-                id="countInStock"
-                type="text"
-                pInputText
-              />
+                mode="decimal"
+                inputId="countInStock"
+                [useGrouping]="false"
+              >
+              </p-inputNumber>
               <small
                 *ngIf="productsForm.countInStock.invalid && isSubmitted"
                 class="p-error"
@@ -98,6 +99,7 @@
                 [options]="categories"
                 formControlName="category"
                 optionLabel="name"
+                optionValue="id"
                 [filter]="true"
                 filterBy="name"
                 [showClear]="true"
@@ -131,6 +133,33 @@
               >
                 Description is required
               </small>
+            </div>
+
+            <div class="field col-12">
+              <label for="richDescription">Product Details</label>
+              <p-editor
+                formControlName="richDescription"
+                [style]="{ height: '320px' }"
+              ></p-editor>
+            </div>
+
+            <div class="field col-12">
+              <label for="name">Main Image</label><br />
+              <input
+                type="file"
+                class="p-inputtext"
+                accept="image/*"
+                (change)="onImageUpload($event)"
+              />
+              <small
+                *ngIf="productsForm.image.invalid && isSubmitted"
+                class="p-error"
+              >
+                Image is required
+              </small>
+              <div class="col-2 mt-2 pl-0">
+                <img style="width: 100%" [src]="imageDisplay" alt="" />
+              </div>
             </div>
           </div>
         </form>

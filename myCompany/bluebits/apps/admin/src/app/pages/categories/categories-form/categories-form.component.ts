@@ -63,7 +63,7 @@ export class CategoriesFormComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: `Category is ${category.name} created!`,
+          detail: `Category ${category.name} is  created!`,
         });
         timer(2000)
           .toPromise()

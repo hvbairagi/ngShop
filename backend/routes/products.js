@@ -109,8 +109,10 @@ router.put("/:id", uploadOptions.single("image"), async (req, res) => {
     const fileName = req.file.filename;
     const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
     imagePath = `${basePath}${fileName}`;
+    console.log("Image path changed to: " + imagePath);
   } else {
     imagePath = product.image;
+    console.log("unchanged");
   }
 
   const updatedProduct = await Product.findByIdAndUpdate(
@@ -119,7 +121,7 @@ router.put("/:id", uploadOptions.single("image"), async (req, res) => {
       name: req.body.name,
       description: req.body.description,
       richDescription: req.body.richDescription,
-      image: req.body.image,
+      image: imagePath,
       brand: req.body.brand,
       price: req.body.price,
       category: req.body.category,
