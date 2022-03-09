@@ -16,6 +16,8 @@ import { ProductsListComponent } from './pages/products/products-list/products-l
 import { ProductsFormComponent } from './pages/products/products-form/products-form.component';
 import { UsersListComponent } from './pages/users/users-list/users-list.component';
 import { UserFormComponent } from './pages/users/user-form/user-form.component';
+import { OrdersListComponent } from './pages/orders/orders-list/orders-list.component';
+import { OrdersDetailComponent } from './pages/orders/orders-detail/orders-detail.component';
 
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
@@ -33,8 +35,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { EditorModule } from 'primeng/editor';
 import { TagModule } from 'primeng/tag';
 import { InputMaskModule } from 'primeng/inputmask';
-import { OrdersListComponent } from './pages/orders/orders-list/orders-list.component';
-import { OrdersDetailComponent } from './pages/orders/orders-detail/orders-detail.component';
+import { FieldsetModule } from 'primeng/fieldset';
 
 const UX_MODULE = [
   CardModule,
@@ -52,6 +53,7 @@ const UX_MODULE = [
   EditorModule,
   TagModule,
   InputMaskModule,
+  FieldsetModule,
 ];
 
 const routes: Routes = [
