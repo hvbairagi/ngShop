@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -8,20 +8,21 @@ import {
   ProductsService,
 } from '@bluebits/products';
 import { MessageService } from 'primeng/api';
-import { timer } from 'rxjs';
+import { Subject, takeUntil, timer } from 'rxjs';
 
 @Component({
   selector: 'admin-products-form',
   templateUrl: './products-form.component.html',
   styles: [],
 })
-export class ProductsFormComponent implements OnInit {
+export class ProductsFormComponent implements OnInit, OnDestroy {
   editMode = false;
   form: FormGroup;
   isSubmitted = false;
   categories = [];
   imageDisplay: string | ArrayBuffer;
   currentProductId: string;
+  endSubs$: Subject<any> = new Subject();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -53,53 +54,62 @@ export class ProductsFormComponent implements OnInit {
   }
 
   private _getCategories() {
-    this.categoriesService.getCategories().subscribe((categories) => {
-      this.categories = categories;
-    });
+    this.categoriesService
+      .getCategories()
+      .pipe(takeUntil(this.endSubs$))
+      .subscribe((categories) => {
+        this.categories = categories;
+      });
   }
 
   private _addProduct(productData: FormData) {
-    this.productsService.createProduct(productData).subscribe(
-      (product: Product) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: `Product ${product.name} is  created!`,
-        });
-        timer(2000)
-          .toPromise()
-          .then(() => {
-            this.location.back();
+    this.productsService
+      .createProduct(productData)
+      .pipe(takeUntil(this.endSubs$))
+      .subscribe({
+        next: (product: Product) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: `Product ${product.name} is  created!`,
           });
-      },
-      () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Product is not created!',
-        });
-      }
-    );
+          timer(2000)
+            .toPromise()
+            .then(() => {
+              this.location.back();
+            });
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Product is not created!',
+          });
+        },
+      });
   }
 
   private _checkEditMode() {
-    this.route.params.subscribe((params) => {
+    this.route.params.pipe(takeUntil(this.endSubs$)).subscribe((params) => {
       if (params.id) {
         this.editMode = true;
         this.currentProductId = params.id;
-        this.productsService.getProduct(params.id).subscribe((product) => {
-          this.productsForm.name.setValue(product.name);
-          this.productsForm.category.setValue(product.category);
-          this.productsForm.brand.setValue(product.brand);
-          this.productsForm.price.setValue(product.price);
-          this.productsForm.countInStock.setValue(product.countInStock);
-          this.productsForm.isFeatured.setValue(product.isFeatured);
-          this.productsForm.description.setValue(product.description);
-          this.productsForm.richDescription.setValue(product.richDescription);
-          this.imageDisplay = product.image;
-          this.productsForm.image.setValidators([]);
-          this.productsForm.image.updateValueAndValidity();
-        });
+        this.productsService
+          .getProduct(params.id)
+          .pipe(takeUntil(this.endSubs$))
+          .subscribe((product) => {
+            this.productsForm.name.setValue(product.name);
+            this.productsForm.category.setValue(product.category);
+            this.productsForm.brand.setValue(product.brand);
+            this.productsForm.price.setValue(product.price);
+            this.productsForm.countInStock.setValue(product.countInStock);
+            this.productsForm.isFeatured.setValue(product.isFeatured);
+            this.productsForm.description.setValue(product.description);
+            this.productsForm.richDescription.setValue(product.richDescription);
+            this.imageDisplay = product.image;
+            this.productsForm.image.setValidators([]);
+            this.productsForm.image.updateValueAndValidity();
+          });
       }
     });
   }
@@ -107,8 +117,9 @@ export class ProductsFormComponent implements OnInit {
   private _updateProduct(productFormData: FormData) {
     this.productsService
       .updateProduct(productFormData, this.currentProductId)
-      .subscribe(
-        (product: Product) => {
+      .pipe(takeUntil(this.endSubs$))
+      .subscribe({
+        next: (product: Product) => {
           this.messageService.add({
             severity: 'success',
             summary: 'Success',
@@ -120,14 +131,14 @@ export class ProductsFormComponent implements OnInit {
               this.location.back();
             });
         },
-        () => {
+        error: () => {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
             detail: 'Product is not updated!',
           });
-        }
-      );
+        },
+      });
   }
 
   onSubmit() {
@@ -167,5 +178,10 @@ export class ProductsFormComponent implements OnInit {
 
   get productsForm() {
     return this.form.controls;
+  }
+
+  ngOnDestroy(): void {
+    this.endSubs$.next(0);
+    this.endSubs$.complete();
   }
 }

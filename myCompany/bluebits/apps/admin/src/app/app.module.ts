@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CategoriesService } from '@bluebits/products';
-import { JwtInterceptor, UsersModule, AuthGuard } from '@bluebits/users';
+import { JwtInterceptor, UsersModule,  } from '@bluebits/users';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
@@ -37,6 +36,7 @@ import { EditorModule } from 'primeng/editor';
 import { TagModule } from 'primeng/tag';
 import { InputMaskModule } from 'primeng/inputmask';
 import { FieldsetModule } from 'primeng/fieldset';
+import { AppRoutingModule } from './app-routing.module';
 
 const UX_MODULE = [
   CardModule,
@@ -56,32 +56,6 @@ const UX_MODULE = [
   InputMaskModule,
   FieldsetModule,
   UsersModule,
-];
-
-const routes: Routes = [
-  {
-    path: '',
-    component: ShellComponent,
-    canActivate: [AuthGuard],
-    children: [
-      { path: 'dashboard', component: DashboardComponent },
-
-      { path: 'categories', component: CategoriesListComponent },
-      { path: 'categories/form', component: CategoriesFormComponent },
-      { path: 'categories/form/:id', component: CategoriesFormComponent },
-
-      { path: 'products', component: ProductsListComponent },
-      { path: 'products/form', component: ProductsFormComponent },
-      { path: 'products/form/:id', component: ProductsFormComponent },
-
-      { path: 'users', component: UsersListComponent },
-      { path: 'users/form', component: UserFormComponent },
-      { path: 'users/form/:id', component: UserFormComponent },
-
-      { path: 'orders', component: OrdersListComponent },
-      { path: 'orders/:id', component: OrdersDetailComponent },
-    ],
-  },
 ];
 
 @NgModule({
@@ -105,7 +79,7 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
-    RouterModule.forRoot(routes, { initialNavigation: 'enabled' }),
+    AppRoutingModule,
     ...UX_MODULE,
   ],
   providers: [

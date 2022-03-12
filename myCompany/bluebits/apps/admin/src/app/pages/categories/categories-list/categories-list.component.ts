@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CategoriesService, Category } from '@bluebits/products';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'admin-categories-list',
   templateUrl: './categories-list.component.html',
   styles: [],
 })
-export class CategoriesListComponent implements OnInit {
+export class CategoriesListComponent implements OnInit, OnDestroy {
   categories: Category[] = [];
+  endSubs$: Subject<any> = new Subject();
 
   constructor(
     private categoriesService: CategoriesService,
@@ -28,23 +30,26 @@ export class CategoriesListComponent implements OnInit {
       header: 'Delete Category',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.categoriesService.deleteCategory(categoryId).subscribe(
-          () => {
-            this._getCategories();
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Category is deleted!',
-            });
-          },
-          () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Category is not deleted!',
-            });
-          }
-        );
+        this.categoriesService
+          .deleteCategory(categoryId)
+          .pipe(takeUntil(this.endSubs$))
+          .subscribe({
+            next: () => {
+              this._getCategories();
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Category is deleted!',
+              });
+            },
+            error: () => {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Category is not deleted!',
+              });
+            },
+          });
       },
     });
   }
@@ -54,8 +59,16 @@ export class CategoriesListComponent implements OnInit {
   }
 
   private _getCategories() {
-    this.categoriesService.getCategories().subscribe((cats) => {
-      this.categories = cats;
-    });
+    this.categoriesService
+      .getCategories()
+      .pipe(takeUntil(this.endSubs$))
+      .subscribe((cats) => {
+        this.categories = cats;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.endSubs$.next(0);
+    this.endSubs$.complete();
   }
 }

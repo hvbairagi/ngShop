@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { User, UserService } from '@bluebits/users';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'admin-users-list',
   templateUrl: './users-list.component.html',
   styles: [],
 })
-export class UsersListComponent implements OnInit {
+export class UsersListComponent implements OnInit, OnDestroy {
   users: User[] = [];
+  endSubs$: Subject<any> = new Subject();
 
   constructor(
     private userService: UserService,
@@ -28,23 +30,26 @@ export class UsersListComponent implements OnInit {
       header: 'Delete User',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.userService.deleteUser(userId).subscribe(
-          () => {
-            this._getUsers();
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'User is deleted!',
-            });
-          },
-          () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'User is not deleted!',
-            });
-          }
-        );
+        this.userService
+          .deleteUser(userId)
+          .pipe(takeUntil(this.endSubs$))
+          .subscribe({
+            next: () => {
+              this._getUsers();
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'User is deleted!',
+              });
+            },
+            error: () => {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'User is not deleted!',
+              });
+            },
+          });
       },
     });
   }
@@ -58,8 +63,16 @@ export class UsersListComponent implements OnInit {
   }
 
   private _getUsers() {
-    this.userService.getUsers().subscribe((users) => {
-      this.users = users;
-    });
+    this.userService
+      .getUsers()
+      .pipe(takeUntil(this.endSubs$))
+      .subscribe((users) => {
+        this.users = users;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.endSubs$.next(0);
+    this.endSubs$.complete();
   }
 }

@@ -1,7 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { LocalStorageService } from '../../services/local-storage.service';
 
@@ -10,11 +11,12 @@ import { LocalStorageService } from '../../services/local-storage.service';
   templateUrl: './login.component.html',
   styles: [],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   loginFormGroup: FormGroup;
   isSubmitted = false;
   authError = false;
   authMessage = 'Email or Password are wrong';
+  endSubs$: Subject<any> = new Subject();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -40,6 +42,7 @@ export class LoginComponent implements OnInit {
     if (this.loginFormGroup.invalid) return;
     this.auth
       .login(this.loginForm.email.value, this.loginForm.password.value)
+      .pipe(takeUntil(this.endSubs$))
       .subscribe({
         next: (user) => {
           this.authError = false;
@@ -58,5 +61,10 @@ export class LoginComponent implements OnInit {
 
   get loginForm() {
     return this.loginFormGroup.controls;
+  }
+
+  ngOnDestroy(): void {
+    this.endSubs$.next(0);
+    this.endSubs$.complete();
   }
 }
