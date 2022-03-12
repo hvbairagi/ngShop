@@ -141,7 +141,9 @@ router.get("/get/totalsales", async (req, res) => {
 router.get(`/get/count`, async (req, res) => {
   const orderCount = await Order.countDocuments((count) => count);
 
-  if (!orderCount) {
+  console.log("Order count: " + orderCount);
+
+  if (!orderCount && orderCount !== 0) {
     res.status(500).json({ success: false });
   }
   res.send({ orderCount: orderCount });
