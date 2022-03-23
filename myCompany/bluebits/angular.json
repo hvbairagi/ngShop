@@ -1,4 +1,7 @@
 {
+  "cli": {
+    "analytics": false
+  },
   "version": 1,
   "projects": {
     "admin": {
@@ -289,7 +292,7 @@
       "projectType": "library",
       "root": "libs/products",
       "sourceRoot": "libs/products/src",
-      "prefix": "bluebits",
+      "prefix": "products",
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
@@ -315,6 +318,7 @@
       "root": "libs/ui",
       "sourceRoot": "libs/ui/src",
       "projectType": "library",
+      "prefix": "ui",
       "architect": {
         "lint": {
           "builder": "@nrwl/linter:eslint",
