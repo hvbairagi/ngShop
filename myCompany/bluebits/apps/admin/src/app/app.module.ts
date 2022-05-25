@@ -4,7 +4,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CategoriesService } from '@bluebits/products';
-import { JwtInterceptor, UsersModule,  } from '@bluebits/users';
+import { JwtInterceptor, UsersModule } from '@bluebits/users';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
