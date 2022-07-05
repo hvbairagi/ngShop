@@ -38,7 +38,6 @@ export class ProductsListComponent implements OnInit, OnDestroy {
   }
 
   deleteProduct(productId) {
-    console.log('delete');
     this.confirmationService.confirm({
       message: 'Do you want to delete this product?',
       header: 'Delete Product',

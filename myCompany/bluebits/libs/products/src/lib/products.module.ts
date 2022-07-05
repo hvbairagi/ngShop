@@ -12,10 +12,11 @@ import { FormsModule } from '@angular/forms';
 import { ProductPageComponent } from './pages/product-page/product-page.component';
 import { RatingModule } from 'primeng/rating';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { UiModule } from '@bluebits/ui';
 
 const routes: Routes = [
   { path: 'products', component: ProductsListComponent },
-  { path: 'category/:categoryId', component: ProductItemComponent },
+  { path: 'category/:categoryId', component: ProductsListComponent },
   { path: 'products/:productId', component: ProductPageComponent },
 ];
 
@@ -29,6 +30,7 @@ const routes: Routes = [
     FormsModule,
     RatingModule,
     InputNumberModule,
+    UiModule,
   ],
   declarations: [
     ProductsSearchComponent,

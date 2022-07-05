@@ -50,7 +50,6 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.router.navigate(['/']);
         },
         error: (error: HttpErrorResponse) => {
-          console.log(error);
           this.authError = true;
           if (error.status !== 400) {
             this.authMessage = 'Error in the server, please try again later!';

@@ -11,6 +11,7 @@ export class OrdersService {
   constructor(private http: HttpClient) {}
 
   readonly apiURLOrders = environment.apiURL + 'orders/';
+  readonly apiURLProducts = environment.apiURL + 'products/';
 
   getOrders(): Observable<Order[]> {
     return this.http.get<Order[]>(this.apiURLOrders);
@@ -45,5 +46,9 @@ export class OrdersService {
     return this.http
       .get<number>(this.apiURLOrders + '/get/totalSales')
       .pipe((objectValue: any) => objectValue.totalSales);
+  }
+
+  getProduct(productId: string): Observable<any> {
+    return this.http.get<any>(this.apiURLProducts + productId);
   }
 }
