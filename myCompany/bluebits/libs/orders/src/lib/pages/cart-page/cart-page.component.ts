@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { CartItemDetailed } from '../../models/cart.model';
 import { CartService } from '../../services/cart.service';
 import { OrdersService } from '../../services/orders.service';
@@ -9,8 +10,10 @@ import { OrdersService } from '../../services/orders.service';
   templateUrl: './cart-page.component.html',
   styles: [],
 })
-export class CartPageComponent implements OnInit {
+export class CartPageComponent implements OnInit, OnDestroy {
   cartItemsDetailed: CartItemDetailed[] = [];
+  cartCount = 0;
+  endSubs$: Subject<any> = new Subject();
 
   constructor(
     private router: Router,
@@ -26,10 +29,14 @@ export class CartPageComponent implements OnInit {
     this.router.navigate(['/products']);
   }
 
-  deleteCartItem(cartItem) {}
+  deleteCartItem(cartItem: CartItemDetailed) {
+    this.cartService.deleteCartItem(cartItem.product.id);
+  }
 
   private _getCartDetails() {
-    this.cartService.cart$.pipe().subscribe((cart) => {
+    this.cartService.cart$.pipe(takeUntil(this.endSubs$)).subscribe((cart) => {
+      this.cartItemsDetailed = [];
+      this.cartCount = cart?.items?.length ?? 0;
       cart.items?.forEach((cartItem) => {
         this.ordersService
           .getProduct(cartItem.productId)
@@ -41,5 +48,20 @@ export class CartPageComponent implements OnInit {
           });
       });
     });
+  }
+
+  updateCartItemQuantity(event, cartItem: CartItemDetailed) {
+    this.cartService.setCartItem(
+      {
+        productId: cartItem.product.id,
+        quantity: event.value,
+      },
+      true
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.endSubs$.next(0);
+    this.endSubs$.complete();
   }
 }

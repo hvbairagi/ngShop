@@ -9,7 +9,7 @@
         ></p-button>
       </div>
       <div>
-        <h4>My Cart: {{ 2 }} Item(s)</h4>
+        <h4>My Cart: {{ cartCount }} Item(s)</h4>
       </div>
       <div class="cart-shipping mb-5">
         Shipping after the payment, Delivery time: 1 to 4 working days
@@ -42,6 +42,8 @@
                 [inputId]="cartItem.product.id"
                 [min]="1"
                 [max]="100"
+                [(ngModel)]="cartItem.quantity"
+                (onInput)="updateCartItemQuantity($event, cartItem)"
               >
               </p-inputNumber>
             </div>
@@ -57,6 +59,6 @@
         </div>
       </div>
     </div>
-    <div class="col-4">order summary</div>
+    <div class="col-4"><orders-order-summary></orders-order-summary></div>
   </div>
 </div>
