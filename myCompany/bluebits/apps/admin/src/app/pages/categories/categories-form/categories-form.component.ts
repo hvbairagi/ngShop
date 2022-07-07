@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CategoriesService, Category } from '@bluebits/products';
 import { MessageService } from 'primeng/api';
-import { Subject, Subscription, takeUntil, timer } from 'rxjs';
+import { Subject, takeUntil, timer } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
