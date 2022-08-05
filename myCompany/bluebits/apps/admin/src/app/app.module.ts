@@ -37,6 +37,8 @@ import { TagModule } from 'primeng/tag';
 import { InputMaskModule } from 'primeng/inputmask';
 import { FieldsetModule } from 'primeng/fieldset';
 import { AppRoutingModule } from './app-routing.module';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 
 const UX_MODULE = [
   CardModule,
@@ -76,6 +78,8 @@ const UX_MODULE = [
   imports: [
     BrowserModule,
     HttpClientModule,
+    StoreModule.forRoot({}),
+    EffectsModule.forRoot([]),
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,

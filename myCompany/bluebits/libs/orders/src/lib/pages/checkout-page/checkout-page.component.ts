@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '@bluebits/users';
 import { MessageService } from 'primeng/api';
+import { Subject, takeUntil } from 'rxjs';
 import { Cart } from '../../models/cart.model';
 import { OrderItem } from '../../models/order-item.model';
 import { Order } from '../../models/order.model';
@@ -15,11 +16,12 @@ import { OrdersService } from '../../services/orders.service';
   templateUrl: './checkout-page.component.html',
   styles: [],
 })
-export class CheckoutPageComponent implements OnInit {
+export class CheckoutPageComponent implements OnInit, OnDestroy {
   checkoutFormGroup: FormGroup;
   isSubmitted = false;
   orderItems: OrderItem[] = [];
-  userId = '61a9a1be70ebaf18d4f2b57e';
+  userId: string;
+  endSubs$: Subject<any> = new Subject();
 
   countries = [];
 
@@ -34,6 +36,7 @@ export class CheckoutPageComponent implements OnInit {
 
   ngOnInit(): void {
     this._initCheckoutForm();
+    this._autoFillUserData();
     this._getCartItems();
     this._getCountries();
   }
@@ -49,6 +52,25 @@ export class CheckoutPageComponent implements OnInit {
       apartment: ['', Validators.required],
       street: ['', Validators.required],
     });
+  }
+
+  private _autoFillUserData() {
+    this.userService
+      .observeCurrentUser()
+      .pipe(takeUntil(this.endSubs$))
+      .subscribe((user) => {
+        if (user) {
+          this.userId = user.id;
+          this.checkoutForm.name.setValue(user.name);
+          this.checkoutForm.email.setValue(user.email);
+          this.checkoutForm.phone.setValue(user.phone);
+          this.checkoutForm.city.setValue(user.city);
+          this.checkoutForm.country.setValue(user.country);
+          this.checkoutForm.zip.setValue(user.zip);
+          this.checkoutForm.apartment.setValue(user.apartment);
+          this.checkoutForm.street.setValue(user.street);
+        }
+      });
   }
 
   private _getCartItems() {
@@ -108,5 +130,10 @@ export class CheckoutPageComponent implements OnInit {
 
   get checkoutForm() {
     return this.checkoutFormGroup.controls;
+  }
+
+  ngOnDestroy(): void {
+    this.endSubs$.next(0);
+    this.endSubs$.complete();
   }
 }
